@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Online Book Store</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ece9f7 40%, #dbeafe 100%);
+      color: #23272f;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 24px 0;
+      background: #4f46e5;
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    .container {
+      display: flex;
+      flex: 1;
+      gap: 32px;
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+    main {
+      flex: 2;
+    }
+    aside#cart-container {
+      flex: 1;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(99,102,241,0.09);
+      padding: 24px;
+      min-width: 320px;
+      max-width: 350px;
+      align-self: flex-start;
+      position: sticky;
+      top: 40px;
+    }
+    h2 {
+      color: #3730a3;
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+    /* Book grid */
+    #book-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      list-style: none;
+      padding: 0;
+    }
+    #book-list li {
+      background: #fff;
+      padding: 22px 20px 16px 20px;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(99,102,241,0.07);
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.18s;
+      border-left: 5px solid #6366f1;
+    }
+    #book-list li:hover {
+      box-shadow: 0 8px 32px rgba(99,102,241,0.13);
+    }
+    #book-list strong {
+      font-size: 19px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #3730a3;
+    }
+    #book-list em {
+      font-size: 14px;
+      color: #727b94;
+      margin-bottom: 10px;
+    }
+    #book-list .price {
+      font-size: 17px;
+      font-weight: 500;
+      color: #4796cf;
+      margin-bottom: 10px;
+    }
+    #book-list button {
+      align-self: flex-end;
+      background: linear-gradient(90deg,#4f46e5 65%,#60a5fa 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 20px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.18s;
+      box-shadow: 0 2px 8px rgba(79,70,229,0.1);
+      margin-top: auto;
+      font-weight: 500;
+    }
+    #book-list button:disabled {
+      background: #cbd5e1;
+      color: #8b95a2;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    #book-list button:not(:disabled):hover {
+      background: #3730a3;
+    }
+    /* Cart Styles */
+    aside#cart-container h2 {
+      margin-top: 0;
+    }
+    #cart-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 18px 0;
+    }
+    #cart-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px dashed #e0e7ef;
+      font-size: 15px;
+      color: #2d3548;
+    }
+    #cart-list li:last-child {
+      border-bottom: none;
+    }
+    #cart-list .cart-title {
+      flex: 1;
+      font-weight: 500;
+      color: #6366f1;
+    }
+    #cart-list .cart-price {
+      margin: 0 12px;
+      font-size: 15px;
+      color: #0956aa;
+    }
+    #cart-list button {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-weight: 500;
+    }
+    #cart-list button.cart-qty-btn {
+      background: #ddd;
+      color: #23272f;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 16px;
+      margin: 0 4px;
+      border: none;
+      min-width: 26px;
+      box-shadow: none;
+    }
+    #cart-list button.cart-qty-btn.plus {
+      background: #b5cef7;
+      color: #154;
+    }
+    #cart-list button.cart-qty-btn:hover {
+      background: #bebebe;
+      color: #232;
+    }
+    #cart-list button.cart-qty-btn.plus:hover {
+      background: #82f7c0;
+      color: #065f46;
+    }
+    #cart-list button.remove-cart-btn {
+      background: #ef4444;
+      color: #fff;
+    }
+    #cart-list button.remove-cart-btn:hover {
+      background: #be123c;
+    }
+    #total-price {
+      display: block;
+      font-weight: 600;
+      color: #0f766e;
+      background: #f1f5f9;
+      border-radius: 7px;
+      padding: 7px 0 7px 12px;
+      margin-top: 10px;
+      margin-bottom: 8px;
+      font-size: 17px;
+      letter-spacing: 0.2px;
+    }
+    #checkout-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px 0;
+      background: linear-gradient(90deg,#16c784 75%,#82f7c0 100%);
+      border: none;
+      border-radius: 8px;
+      color: #065f46;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: background 0.2s;
+      box-shadow: 0 2px 10px rgba(22,199,132,0.10);
+    }
+    #checkout-btn:hover {
+      background: #0d9488;
+      color: #fff;
+    }
+    /* Responsive */
+    @media (max-width: 900px) {
+      .container { flex-direction: column; gap: 0; }
+      aside#cart-container { margin: 24px 0 0 0; max-width: 100%; position: static; }
+    }
+    @media (max-width: 500px) {
+      main, aside#cart-container {
+        padding: 0;
+      }
+      #book-list { gap: 14px; }
+      aside#cart-container { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Modern Book Store</h1>
+    <span style="font-size:15px;font-weight:400;opacity:.86;">Read. Shop. Enjoy books delivered at your door!</span>
+  </header>
+  <div class="container">
+    <main>
+      <h2>Available Books</h2>
+      <ul id="book-list"></ul>
+    </main>
+    <aside id="cart-container">
+      <h2>Your Cart</h2>
+      <ul id="cart-list"></ul>
+      <span id="total-price">Total: $0.00</span>
+      <button id="checkout-btn">Proceed to Checkout</button>
+    </aside>
+  </div>
+  <script>
+    // Book Data
+    const books = [
+      { title: "Clean Code", author: "Robert C. Martin", price: 35.99, availability: "in stock" },
+      { title: "You Don't Know JS Yet", author: "Kyle Simpson", price: 30.00, availability: "in stock" },
+      { title: "Eloquent JavaScript", author: "Marijn Haverbeke", price: 28.50, availability: "out of stock" },
+      { title: "JavaScript: The Good Parts", author: "Douglas Crockford", price: 25.99, availability: "in stock" }
+    ];
+
+    // Cart array: { bookIndex: number, quantity: number }
+    let cart = [];
+
+    // Add or increment book in cart
+    function addToCart(bookIndex) {
+      const found = cart.find(item => item.bookIndex === bookIndex);
+      if (found) {
+        found.quantity += 1;
+      } else {
+        cart.push({ bookIndex, quantity: 1 });
+      }
+      renderCart();
+    }
+
+    // Decrement quantity or remove from cart
+    function decrementCart(bookIndex) {
+      const foundIdx = cart.findIndex(item => item.bookIndex === bookIndex);
+      if (foundIdx > -1) {
+        if (cart[foundIdx].quantity > 1) {
+          cart[foundIdx].quantity -= 1;
+        } else {
+          cart.splice(foundIdx, 1);
+        }
+        renderCart();
+      }
+    }
+
+    // Remove all of this item from cart
+    function removeFromCart(bookIndex) {
+      const idx = cart.findIndex(item => item.bookIndex === bookIndex);
+      if (idx > -1) {
+        cart.splice(idx, 1);
+        renderCart();
+      }
+    }
+
+    // Total calculation
+    function calculateTotal() {
+      return cart.reduce((total, item) => total + books[item.bookIndex].price * item.quantity, 0).toFixed(2);
+    }
+    // Show available books
+    function renderBooks() {
+      const bookList = document.getElementById('book-list');
+      bookList.innerHTML = '';
+      books.forEach((book, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>${book.title}</strong>
+          <div class="price">$${book.price}</div>
+          <em>by ${book.author}</em>
+          <em>${book.availability}</em>
+          <button ${book.availability === 'out of stock' ? 'disabled' : ''} onclick="addToCart(${index})">
+            ${book.availability === 'out of stock' ? 'Sold Out' : 'Add to Cart'}
+          </button>
+        `;
+        bookList.appendChild(li);
+      });
+    }
+
+    // Render cart with quantity and +/– buttons
+    function renderCart() {
+      const cartList = document.getElementById('cart-list');
+      const totalPrice = document.getElementById('total-price');
+      cartList.innerHTML = '';
+      cart.forEach(item => {
+        const book = books[item.bookIndex];
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span class="cart-title">${book.title}</span>
+          <button class="cart-qty-btn" onclick="decrementCart(${item.bookIndex})">–</button>
+          <span>${item.quantity}</span>
+          <button class="cart-qty-btn plus" onclick="addToCart(${item.bookIndex})">+</button>
+          <span class="cart-price">$${(book.price * item.quantity).toFixed(2)}</span>
+          <button class="remove-cart-btn" onclick="removeFromCart(${item.bookIndex})">Remove</button>
+        `;
+        cartList.appendChild(li);
+      });
+      totalPrice.textContent = `Total: $${calculateTotal()}`;
+    }
+
+    // Expose functions to global
+    window.addToCart = addToCart;
+    window.decrementCart = decrementCart;
+    window.removeFromCart = removeFromCart;
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', () => {
+      renderBooks();
+      renderCart();
+    });
+  </script>
+</body>
+</html>

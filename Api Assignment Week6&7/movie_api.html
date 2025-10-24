@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interactive Movie Ticket Booking</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      text-align: center;
+      background-color: #f4f7f6;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    input {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #output {
+      margin-top: 30px;
+      background-color: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: left;
+      white-space: pre-wrap;
+      border: 1px solid #eee;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .action-box {
+      background-color: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      text-align: left;
+    }
+    .action-box h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+    .message {
+      font-weight: bold;
+    }
+    .success { color: #28a745; }
+    .error { color: #dc3545; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>🎬 Interactive Movie Ticket Booking</h2>
+  <p>Enter details below to manage bookings.</p>
+
+  <div class="action-box">
+    <h3>POST - Book a New Ticket</h3>
+    <input type="text" id="bookName" placeholder="Name">
+    <input type="text" id="bookMovie" placeholder="Movie Title">
+    <input type="number" id="bookSeats" placeholder="Seats" min="1">
+    <button onclick="bookTicket()">Book Ticket</button>
+  </div>
+
+  <div class="action-box">
+    <h3>PUT - Update a Booking</h3>
+    <input type="number" id="updateId" placeholder="Booking ID to Update" min="1">
+    <input type="text" id="updateName" placeholder="New Name">
+    <input type="text" id="updateMovie" placeholder="New Movie Title">
+    <input type="number" id="updateSeats" placeholder="New Seat Count" min="1">
+    <button onclick="updateBooking()">Update Booking</button>
+  </div>
+  
+  <div class="action-box">
+    <h3>DELETE - Cancel a Booking</h3>
+    <input type="number" id="cancelId" placeholder="Booking ID to Cancel" min="1">
+    <button onclick="cancelBooking()">Cancel Booking</button>
+  </div>
+
+  <pre id="output"></pre>
+</div>
+
+<script>
+  let bookings = [
+    { id: 1, name: "Rahul", movie: "Avengers", seats: 2 },
+    { id: 2, name: "Priya", movie: "Inception", seats: 3 }
+  ];
+  let nextId = 3; // To assign unique IDs to new bookings
+
+  // Function to display the current bookings in the output area
+  function renderOutput(message, type = 'success') {
+    document.getElementById("output").innerHTML =
+      `<span class="message ${type}">${message}</span>\n\n🎟️ Current Bookings:\n` + JSON.stringify(bookings, null, 2);
+  }
+
+  // POST: Add a new ticket
+  function bookTicket() {
+    const name = document.getElementById('bookName').value;
+    const movie = document.getElementById('bookMovie').value;
+    const seats = parseInt(document.getElementById('bookSeats').value);
+
+    if (!name || !movie || !seats) {
+      renderOutput("Error: All fields are required to book a ticket.", "error");
+      return;
+    }
+
+    const newBooking = { id: nextId++, name: name, movie: movie, seats: seats };
+    bookings.push(newBooking);
+    renderOutput("Success: Ticket booked for " + newBooking.name);
+  }
+
+  // PUT: Update an existing booking
+  function updateBooking() {
+    const id = parseInt(document.getElementById('updateId').value);
+    const name = document.getElementById('updateName').value;
+    const movie = document.getElementById('updateMovie').value;
+    const seats = parseInt(document.getElementById('updateSeats').value);
+
+    if (!id || !name || !movie || !seats) {
+      renderOutput("Error: All fields are required to update a booking.", "error");
+      return;
+    }
+    
+    let index = bookings.findIndex(b => b.id === id);
+    if (index !== -1) {
+      bookings[index] = { id, name, movie, seats }; // Update the booking
+      renderOutput("Success: Booking " + id + " was updated.");
+    } else {
+      renderOutput("Error: Booking with ID " + id + " not found!", "error");
+    }
+  }
+
+  // DELETE: Cancel a booking
+  function cancelBooking() {
+    const id = parseInt(document.getElementById('cancelId').value);
+
+    if (!id) {
+      renderOutput("Error: Please enter a booking ID to cancel.", "error");
+      return;
+    }
+
+    let index = bookings.findIndex(b => b.id === id);
+    if (index !== -1) {
+      bookings.splice(index, 1);
+      renderOutput("Success: Booking with ID " + id + " was cancelled.");
+    } else {
+      renderOutput("Error: Booking with ID " + id + " not found!", "error");
+    }
+  }
+
+  // Show initial bookings when the page loads
+  renderOutput("Welcome! Current bookings are loaded.");
+</script>
